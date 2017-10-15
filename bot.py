@@ -79,7 +79,7 @@ async def on_message(message):
     if message.author != client.user:
         return
 
-    if not message.channel.permissions_for(message.author).manage_emojis:
+    if not message.channel.permissions_for(message.author).manage_emojis and msg.startswith('>'):
         print('You do not have permissions to manage emojis in this server!')
         return
 
@@ -183,7 +183,6 @@ async def on_message(message):
         await client.add_reaction(message, '✅')
 
     if msg.startswith('>exit'):
-        quit()
         exit()
 
 @client.event
