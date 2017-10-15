@@ -1,0 +1,31 @@
+#####################
+DISCORD EMOJI MANAGER
+#####################
+Before using, fill in ex.config.yaml and RENAME to config.yaml.
+
+Import emojis from http://discordemoji.com,
+Clear emojis from your server,
+or steal emojis from another one!
+
+COMMANDS
+-----------
+All commands are in your server's text channel.
+
+>addemoji <emoji name> <OPTIONAL name override>
+Adds emoji from the Emojis folder to your server. If no optional name is specified,
+the command will use the file's name as an emoji alias.
+
+>addfolder <directory name>
+Adds all images inside a folder in this script's directory as emojis.
+
+>DEaddemoji <emoji name> <OPTIONAL name override>
+Adds emoji from discordemoji.com to your server!
+
+>DEaddcategory <category name>
+Adds all emoji from a discordemoji.com category to your server!
+
+>stealemojis <server id>
+Steals all emojis from the specified server!
+
+>clearemojis
+Clears all emojis from the current server.
