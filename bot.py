@@ -33,6 +33,11 @@ Adds emoji from discordemoji.com to your server!
 >DEaddcategory <category name>
 Adds all emoji from a discordemoji.com category to your server!
 
+>stealemoji <emoji name> <OPTIONL server ID> <OPTIONAL name override>
+Steals an emoji from your visible emojis. If you want to target a specific server,
+enter a server ID. If you want to change the name, you must enter both
+the server ID and the overriden name.
+
 >stealemojis <server id>
 Steals all emojis from the specified server!
 
@@ -87,12 +92,17 @@ async def on_message(message):
 
     if msg.startswith('>addemoji'):
         params = msg.split(' ')
+        if len(params) < 2:
+            await client.add_reaction(message, '❌')
+            print('Invalid arguments. Please read the command guide.')
+            return
         emote_name = params[2] if len(params) == 3 else params[1].split('.')[0]
         print('ADDING - ' + emote_name)
         try:
             try:
                 f = open('Emojis/{}'.format(params[1]), 'rb')
             except:
+                await client.add_reaction(message, '❌')
                 print('Error opening {}. Maybe it doesn\'t exist?'.format(params[1]))
                 return
             await client.create_custom_emoji(server=message.server, name=emote_name, image=f.read())
@@ -104,6 +114,10 @@ async def on_message(message):
 
     if msg.startswith('>addfolder'):
         params = msg.split(' ')
+        if len(params) < 2:
+            await client.add_reaction(message, '❌')
+            print('Invalid arguments. Please read the command guide.')
+            return
         root = os.path.dirname(__file__)
         directory = root + params[1] + '/'
         ext = ('.png', '.jpeg', '.jpg')
@@ -126,6 +140,10 @@ async def on_message(message):
         
     if msg.startswith('>DEaddemoji'):
         params = msg.split(' ')
+        if len(params) < 2:
+            await client.add_reaction(message, '❌')
+            print('Invalid arguments. Please read the command guide.')
+            return
         try:
             selected_emote = [emote for emote in all_emojis if emote[1] == params[1].lower()][0]
         except Exception as e:
@@ -145,6 +163,10 @@ async def on_message(message):
             
     if msg.startswith('>DEaddcategory'):
         params = msg.split(' ', 1)
+        if len(params) < 2:
+            await client.add_reaction(message, '❌')
+            print('Invalid arguments. Please read the command guide.')
+            return
         selected_category = [emote for emote in all_emojis if emote[3].lower() == params[1].lower()]
         if not selected_category:
             await client.add_reaction(message, '❌')
@@ -172,6 +194,10 @@ async def on_message(message):
 
     if msg.startswith('>stealemojis'):
         params = msg.split(' ', 1)
+        if len(params) < 2:
+            await client.add_reaction(message, '❌')
+            print('Invalid arguments. Please read the command guide.')
+            return
         server = client.get_server(params[1])
         for emote in server.emojis:
             try:
@@ -180,6 +206,34 @@ async def on_message(message):
                 await client.create_custom_emoji(server=message.server, name=emote.name, image=custom_image)
             except Exception as e:
                 print('Error for ' + emote.name + ' | ' + str(e))
+        await client.add_reaction(message, '✅')
+
+    if msg.startswith('>stealemoji'):
+        params = msg.split(' ')
+        if len(params) < 2:
+            await client.add_reaction(message, '❌')
+            print('Invalid arguments. Please read the command guide.')
+            return
+        emotelist = client.get_all_emojis() if len(params) == 2 else client.get_server(params[2])
+        if emotelist.emojis is None:
+            await client.add_reaction(message, '❌')
+            print('Server not found! Enter a proper server ID!')
+            return
+        stolenemoji = discord.utils.find(lambda e: e.name.lower() == params[1].lower(), emotelist)
+        if stolenemoji:
+            try:
+                print('ADDING - ' + stolenemoji.name)
+                emote_name = stolenemoji.name if len(params) < 3 else params[3]
+                custom_image = requests.get(stolenemoji.url).content
+                await client.create_custom_emoji(server=message.server, name=emote_name, image=custom_image)
+            except Exception as e:
+                await client.add_reaction(message, '❌')
+                print('Error adding emoji! | ' + str(e))
+                return
+        else:
+            await client.add_reaction(message, '❌')
+            print('Emoji {} not found!'.format(params[1]))
+            return
         await client.add_reaction(message, '✅')
 
     if msg.startswith('>exit'):
